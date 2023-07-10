@@ -1,1 +1,1 @@
-# Client Application to manage database with python
+# Client Application to menage database with python
