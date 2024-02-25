@@ -1,4 +1,3 @@
-/*
 libname 
 	LAB01
 	BASE
@@ -12,7 +11,6 @@ data wynik;
 	p=p*n;
 	if 1=e then put _all_;
 run;
-*/
 
 /*
 3. Napisać program znajdujący liczbę dni, które upłynęły od dnia urodzin piszącego program do dnia dzisiejszego. 
