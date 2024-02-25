@@ -1,7 +1,7 @@
 libname 
 	LAB01
 	BASE
-	"path.."
+	"~/home/u63791642/sasuser.v94/datasets/lab01"
 ;
 
 data wynik;
@@ -101,3 +101,9 @@ proc datasets lib=work;
     delete C;
 run;
 	
+	
+	
+	
+	
+	
+
