@@ -1,6 +1,6 @@
 
 /*
-  Petle:
+  Loops:
 */
 
 data a0;
