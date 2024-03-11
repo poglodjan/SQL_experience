@@ -1,5 +1,8 @@
+libname bib "/home/u63791642/datasets/";
+run;
+
 /* ------------------------------- */
-/* zadanie 1 */
+/* task 1 */
 data zad1;
 	call streaminit(0);
 
@@ -35,84 +38,241 @@ proc print data=stats;
 run;
 
 /* ------------------------------- */
-/* zadanie 9 */
+/* task 2 */
+
+data zad2;
+    set bib.l02z02;
+    do i=1 to x;
+    	output;
+    end;
+    drop i;
+run;
+
+/* ------------------------------- */
+/* task 3 */
+
+data zad3;
+	set bib.l02z03;
+	by descending x;
+	retain klasyfikacja 0;
+	
+	if first.x then klasyfikacja+1;
+	output;
+run;
+
+/* (*)gdy zbiór nieposortowany po x: */
+proc sort data=bib.l02z03s;
+	by descending x;
+run;
+data zad3_2;
+	set bib.l02z03s;
+	by descending x;
+	retain klasyfikacja 0;
+	
+	if first.x then klasyfikacja+1;
+	output;
+run;
+
+/* ------------------------------- */
+/* task 4 */
+
+data zad4;
+	set bib.l02z04 end=last;
+	retain n_wzrostow 0 n_spadkow 0;
+	prev_index = lag(index);
+	if _n_>1 then do;
+		if index > prev_index then n_wzrostow+1;
+		if index < prev_index then n_spadkow+1;
+	end;
+	drop prev_index;
+	
+	if last then do;
+		keep n_wzrostow n_spadkow;
+		output;
+	end;
+run;
+proc print data=zad4;
+run;
+
+/* ------------------------------- */
+/* task 5 */
+data zad5_k1; 
+	put "v1=" v1 "v2=" v2 "v3=" v3;
+    set bib.l02z05; 
+    put "v1=" v1 "v2=" v2 "v3=" v3;
+	retain v3;
+    v3 = v1 + v2;
+run;
+
+data zad5_k2; 
+	put "v1=" v1 "v2=" v2 "v3=" v3 "v4=" v4;
+    set bib.l02z05; 
+	retain v3;
+    v3 = v1 + v2;
+    v4 = v1 + v2;
+    put "v1=" v1 "v2=" v2 "v3=" v3 "v4=" v4;
+run;
+
+data zad5_k3; 
+    put "2) v1=" v1 "v2=" v2 "v3=" v3 "v4=" v4;
+    v3 = v1 + v2;
+	put "1) v1=" v1 "v2=" v2 "v3=" v3 "v4=" v4;
+    set bib.l02z05; 
+	retain v4;
+    v4 = v1 + v2;
+run;
+
+/* ------------------------------- */
+/* task 6 */
+data zad6;
+	set bib.l02z04 end=last;
+	retain n_maksim 0;
+	prev_index = lag(index);
+	prev2_index = lag2(index);
+	if _n_=2 then do;
+		if index<prev_index then n_maksim+1;
+	end;
+	
+	if _n_>2 then do;
+		if prev_index>index and prev_index>prev2_index then n_maksim+1;
+	end;
+	
+	if last then do;
+		keep n_maksim;
+		output;
+	end;
+run;
+proc print data=zad6;
+run;
+
+/* ------------------------------- */
+/* task 7 */	
+data zad7;
+    set bib.l02z07 end=last;
+    prev_x = lag(x);
+    prev2_x = lag2(x);
+    if prev_x = . then do;
+        prev_x = (prev2_x + x) / 2;
+    end;
+    if _n_ >= 2 then output;
+    if last then do;
+    	prev_x = x;
+    	output;
+    end;
+    keep prev_x;
+run;
+proc print data=zad7;
+run;
+
+** podwojne braki danych;
+data zad7_2;
+    set bib.l02z07s end=last;
+    prev_x = lag(x);
+    prev2_x = lag2(x);
+    prev3_x = lag3(x);
+    if prev_x = . then do;
+        prev_x = (prev2_x + x) / 2;
+    end;
+    if prev2_x = . and prev_x = . then do; 
+        prev2_x = prev_x;
+        prev_x = (prev3_x + x) / 2;
+    end;
+    if _n_ >= 2 then output;
+    if last then do;
+    	prev_x = x;
+    	output;
+    end;
+    keep prev_x
+run;
+data zad7_2;
+    set zad7_2 end=last;
+    p = lag(prev_x);
+	p2 = lag2(prev_x);
+	p3 = lag3(prev_x);
+    if p = . then do;
+        p = (p2 + prev_x) / 2;
+    end;
+    if p2 = . and p = . then do; 
+        p2 = p;
+        p = (p3 + prev_x) / 2;
+    end;
+    if _n_ >= 2 then output;
+    if last then do;
+    	p = prev_x;
+    	output;
+    end;
+    keep p;
+    rename p=x;
+run;
+proc print data=zad7_2;
+run;
+**;
+
+/* ------------------------------- */
+/* task 8 */
+data zad8;
+    set bib.l02z08;
+    if rand("uniform") < 0.5 then do;
+        output; 
+        x = .; 
+    end;
+    if rand("uniform") < 0.5 then do;
+        output; 
+        y = .; 
+    end;
+    output;
+run;
+proc print;
+
+
+/* ------------------------------- */
+/* task 9 */
 data Fx;
     input x fx;
     datalines;
 1 0.1
-2 0.3
-3 0.5
-4 0.7
-5 1.0
+2 0.15
+3 0.24
+4 0.4
+5 0.77
+6 0.83
+7 0.9
+8 1.0
 ;
-
-proc print data=Fx;
-run;
-
 data px;
     set Fx;
-    if _n_ = 1 then prev_fx = 0; 
-    px = fx - prev_fx; 
-    prev_fx = fx; 
-    output;
+    px = fx - lag(fx); 
+	if _n_=1 then px = fx;
+	keep px;
 run;
-
 proc print data=px;
 run;
 
 
 /* ------------------------------- */
-/* zadanie 10 */
-data trajektoria1 trajektoria2 max_odchylenie wspolne_wierzcholki przeciecia;
-    retain x1 0 x2 0;
-    array max_odchylenie{8} 0;
-    array wspolne_wierzcholki{2} (0 0);
-    array poprzednie_x{2} (0 0);
-    array przeciecia{2} (0 0);
-    n = 1000; /* liczba kroków w trajektorii */
-
-    do i = 1 to n;
-        x1 = x1 + rand("normal");
-        x2 = x2 + rand("normal");
-
-        /* (a) Maksymalne odchylenia od zera */
-        max_odchylenie[1] = max(max_odchylenie[1], abs(x1));
-        max_odchylenie[2] = max(max_odchylenie[2], abs(x2));
-
-        /* (b) Liczba wspólnych wierzchołków */
-        wspolne_wierzcholki[1] + (poprzednie_x[1] ne 0 and x1 = 0);
-        wspolne_wierzcholki[2] + (poprzednie_x[2] ne 0 and x2 = 0);
-
-        /* (c) Liczba przecięć */
-        przeciecia[1] + (poprzednie_x[1] > 0 and x1 < 0);
-        przeciecia[2] + (poprzednie_x[2] > 0 and x2 < 0);
-
-        poprzednie_x[1] = x1;
-        poprzednie_x[2] = x2;
+/* task 10 */
+data max_odchylenie;
+    call streaminit(0);  /* Inicjalizacja generatora liczb losowych */
+    
+    do _replica = 1 to 1000;  
+        x1 = 0;
+        x2 = 0;
+        max_odchylenie1 = 0;
+        max_odchylenie2 = 0;
         
-        output trajektoria1;
-        output trajektoria2;
+        do _obs = 1 to 100;  
+        	if rand("uniform") < 0.5 then x1 = x1 + 1;
+        	else x1 = x1 - 1;
+        	if rand("uniform") < 0.5 then x2 = x2 + 1;
+        	else x2 = x2 - 1;
+
+            max_odchylenie1 = max(max_odchylenie1, abs(x1));
+            max_odchylenie2 = max(max_odchylenie2, abs(x2));
+        end;
+        
+        put "Maks odchylenie od zera (Trajektoria 1): " max_odchylenie1
+            " Maks odchylenie od zera (Trajektoria 2): " max_odchylenie2;
+        keep max_odchylenie1 max_odchylenie2;
     end;
-
-    drop i n;
 run;
-
-/* Wypisanie wyników do loga */
-proc print data=max_odchylenie noobs; 
-    var max_odchylenie1 max_odchylenie2;
-    title 'Maksymalne odchylenia od zera';
-run;
-
-proc print data=wspolne_wierzcholki noobs; 
-    var wspolne_wierzcholki1 wspolne_wierzcholki2;
-    title 'Liczba wspólnych wierzchołków';
-run;
-
-proc print data=przeciecia noobs; 
-    var przeciecia1 przeciecia2;
-    title 'Liczba przecięć';
-
-
-
-
-	
+proc print;
