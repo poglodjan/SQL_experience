@@ -1,1 +1,1 @@
-I will upload soon
+My projects from college while learning math and data analysis
